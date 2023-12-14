@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sorcery! Combat Game - Singleplayer</title>
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .combat-container {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .stamina-circle {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            left: 50px;
+            top: 50px;
+            border-radius: 50%;
+            background-color: #0080ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            user-select: none;
+            font-family: Arial, sans-serif;
+            font-size: 22px;
+            color: #fff;
+        }
+
+        .bar-container {
+            position: absolute;
+            width: 20px;
+            height: 500px;
+            left: 150px;
+            top: 150px;
+            background-color: #c0c0c0;
+            margin-left: 50px;
+        }
+
+        .attack-limit-bar {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background-color: #0080ff;
+            z-index: 0;
+        }
+
+        .red-bar {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background-color: #ff0000;
+        }
+
+        .indicator {
+            position: absolute;
+            bottom: 0;
+            left: -5px;
+            width: 30px;
+            height: 8px;
+            background-color: #FF0000;
+            cursor: grab;
+            z-index: 1;
+        }
+
+        .enemy-indicator {
+            position: absolute;
+            bottom: 0;
+            right: -5px;
+            width: 30px;
+            height: 8px;
+            background-color: #FF0000;
+            cursor: grab;
+            z-index: 1;
+        }
+
+        .attack-text {
+            position: absolute;
+            top: 700px;
+            left: 150px;
+            margin-top: 10px;
+            font-size: 18px;
+            user-select: none;
+        }
+
+        .attack-limit-text {
+            position: absolute;
+            top: 750px;
+            left: 150px;
+            margin-top: 10px;
+            font-size: 18px;
+            user-select: none;
+        }
+
+        .action-button {
+            position: absolute;
+            top: 600px;
+            left: 475px;
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #0080ff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+        }
+
+        .log-container {
+            position: absolute;
+            top: 400px;
+            left: 415px;
+            max-height: 70px;
+            overflow-y: scroll;
+            background-color: #fff;
+            padding: 10px 20px;
+            border: 3px solid #ccc;
+            margin-top: 10px;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+
+        .enemy-bar-container {
+            position: absolute;
+            left: 800px;
+            top: 150px;
+            width: 20px;
+            height: 500px;
+            background-color: #c0c0c0;
+            margin-left: 50px;
+        }
+
+        .enemy-orange-bar {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background-color: #FFA500;
+        }
+
+        .enemy-attack-text {
+            position: absolute;
+            top: 700px;
+            left: 800px;
+            margin-top: 10px;
+            font-size: 18px;
+            user-select: none;
+        }
+
+        .enemy-attack-limit-text {
+            position: absolute;
+            display: none;
+            top: 750px;
+            left: 800px;
+            margin-top: 10px;
+            font-size: 18px;
+            user-select: none;
+        }
+
+        .enemy-stamina-circle {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            left: 900px;
+            top: 50px;
+            border-radius: 50%;
+            background-color: #FFA500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 50px;
+            user-select: none;
+            font-family: Arial, sans-serif;
+            font-size: 22px;
+            color: #fff;
+        }
+
+          .damage-number {
+          position: absolute;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 30px;
+          font-weight: bold;
+          text-align: center;
+          pointer-events: none;
+          font-family: Arial, sans-serif;
+        }
+        .player-damage {
+          position: absolute;
+          top: 180px; 
+          left: 83px;
+          color: red; 
+        }
+        .enemy-damage {
+          position: absolute;
+          top: 180px; 
+          left: 983px; 
+          color: red;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="combat-container">
+        <div class="bar-container">
+            <div class="attack-limit-bar"></div>
+            <div class="indicator"></div>
+        </div>
+        <div class="enemy-bar-container">
+            <div class="enemy-orange-bar"></div>
+            <div class="enemy-indicator"></div>
+        </div>
+        <div class="enemy-attack-text">Attack Power: 0</div>
+        <div class="enemy-attack-limit-text">Attack Limit: 10</div>
+        <div class="attack-text">Attack Power: 0</div>
+        <div class="attack-limit-text">Attack Limit: 10</div>
+    </div>
+
+    <div class="stamina-container">
+        <div class="stamina-circle">
+            <div class="stamina-text">5/5</div>
+        </div>
+        <div class="enemy-stamina-circle">
+            <div class="stamina-text">10/10</div>
+        </div>
+        <button class="action-button">DEFEND</button>
+    </div>
+
+    <div class="flash-effect"></div>
+
+    <div class="log-container"></div>
+
+   <script>
+ // Variable declarations
+let isDragging = false;
+let initialY = 0;
+let initialTop = 0;
+let playerAttackPower = 0;
+let enemyAttackPower = 0;
+let playerStamina = 5;
+let enemyStamina = 10;
+let attackCount = 1;
+let isPlayerTurn = false;
+let playerWins = false;
+let playerAttackLimit = 10;
+let enemyAttackLimit = 10;
+const defendStaminaRecovery = 0.3;
+const playerMaxAttackLimit = 10; // Define the maximum attack limit for the player
+const enemyMaxAttackLimit = 10; // Define the maximum attack limit for the enemy
+let attackLimitRecoveryRate = 1;
+
+
+// DOM element references
+const bar = document.querySelector('.bar-container');
+const indicator = document.querySelector('.indicator');
+const attackLimitBar = document.querySelector('.attack-limit-bar');
+const attackText = document.querySelector('.attack-text');
+const enemyattackText = document.querySelector('.enemy-attack-text');
+const attacklimitText = document.querySelector('.attack-limit-text');
+const enemylimitattackText = document.querySelector('.enemy-attack-limit-text');
+const staminaText = document.querySelectorAll('.stamina-text')[0];
+const enemyStaminaText = document.querySelectorAll('.stamina-text')[1];
+const actionButton = document.querySelector('.action-button');
+const flashEffect = document.querySelector('.flash-effect');
+const logContainer = document.querySelector('.log-container');
+const enemyBar = document.querySelector('.enemy-bar-container');
+const enemyIndicator = document.querySelector('.enemy-indicator');
+const enemyOrangeBar = document.querySelector('.enemy-orange-bar');
+
+// Event listeners
+document.addEventListener('mousedown', startDragging);
+indicator.addEventListener('mousedown', startDragging);
+document.addEventListener('mousemove', dragIndicator);
+document.addEventListener('mouseup', stopDragging);
+document.addEventListener('mouseleave', stopDragging);
+actionButton.addEventListener('click', performPlayerTurn);
+bar.addEventListener('click', handleBarClick);
+
+// Dragging functions
+function startDragging(event) {
+  if (event.button !== 0) return; // Only start dragging on left click
+  isDragging = true;
+  initialY = event.clientY;
+  initialTop = parseFloat(getComputedStyle(indicator).bottom) || 0;
+}
+
+function dragIndicator(event) {
+  if (!isDragging) return;
+  const barHeight = bar.offsetHeight - 8;
+  const deltaY = initialY - event.clientY;
+  const newTop = Math.max(0, Math.min(initialTop + deltaY, (playerAttackLimit / 10) * (barHeight)));
+
+  const attackPower = (newTop / (barHeight)) * 10;
+  attackText.textContent = `Attack Power: ${attackPower === 10 ? attackPower.toFixed(0) : attackPower.toFixed(1).replace('.0', '')}`;
+  updateIndicator(indicator, attackText, newTop, attackPower);
+  updateActionButton(actionButton, attackPower);
+
+  const enemyAttackPower = (enemyIndicator.style.bottom.replace('px', '') / (barHeight)) * enemyAttackLimit;
+  if (enemyAttackPower > enemyAttackLimit) {
+    updateEnemyIndicatorToLimit(enemyIndicator, enemyOrangeBar, enemyattackText, enemyAttackLimit);
+
+  }
+}
+
+
+
+function stopDragging() {
+  if (!isDragging) return;
+  isDragging = false;
+}
+
+// Update functions
+function updateEnemyIndicator(enemyIndicator, enemyOrangeBar, enemyAttackText, newTop, enemyAttackPower) {
+  enemyIndicator.style.bottom = newTop + 'px';
+  enemyOrangeBar.style.height = (enemyAttackPower / enemyAttackLimit) * 100 + '%';
+  enemyAttackText.textContent = enemyAttackPower.toFixed(1).replace('.0', '');
+}
+
+function updateIndicator(indicator, attackText, newTop, attackPower) {
+  indicator.style.bottom = `${newTop}px`;
+  
+}
+
+function updateStamina(staminaText, enemyStaminaText, playerStamina, enemyStamina) {
+  if (playerStamina != 5)
+    staminaText.textContent = `${playerStamina}/5`;
+  if (enemyStamina != 10)
+    enemyStaminaText.textContent = `${enemyStamina}/10`;
+}
+
+function updateActionButton(actionButton, playerAttackPower) {
+  if (playerAttackPower.toFixed(1) <= 0.0) {
+    actionButton.textContent = 'DEFEND';
+  } else {
+    actionButton.textContent = 'ATTACK';
+  }
+}
+
+function updateLogScroll(logContainer) {
+  logContainer.scrollTop = logContainer.scrollHeight;
+}
+
+function updateIndicatorToLimit(indicator, attackLimitBar, attackText) {
+  const barHeight = bar.offsetHeight;
+  const newTop = (playerAttackLimit / 10) * barHeight;
+  const attackPower = playerAttackLimit;
+
+  // Update the blue bar (attackLimitBar)
+  attackLimitBar.style.height = `${newTop}px`;
+
+}
+
+function updateAttackPower(indicator, attackLimitBar, attackText) {
+  const barHeight = bar.offsetHeight - 8;
+  const newTop = (playerAttackLimit / 10) * barHeight;
+  const attackPower = playerAttackLimit.toFixed(1) === "10.0" ? 10 : playerAttackLimit;
+
+  // Update the blue bar (attackLimitBar)
+  attackLimitBar.style.height = `${newTop}px`;
+
+  // Update the attack limit indicator
+  indicator.style.bottom = `${newTop}px`;
+  attackText.textContent = `Attack Power:  ${attackPower === 10 ? '10' : attackPower.toFixed(1).replace('.0', '')}`;
+}
+
+function updateEnemyAttackPower(enemyIndicator, enemyOrangeBar, enemyattackText, enemyAttackPower) {
+  const barHeight = enemyOrangeBar.offsetHeight - 8;
+  const newTop = (enemyAttackPower / 10) * barHeight;
+  const formattedAttackPower = enemyAttackPower === 10 ? '10' : enemyAttackPower.toFixed(1).replace('.0', '');
+
+  // Update the blue bar (enemyOrangeBar)
+  enemyOrangeBar.style.height = `${newTop}px`;
+
+  // Update the attack limit indicator
+  enemyIndicator.style.bottom = `${newTop}px`;
+  enemyattackText.textContent = `Attack Power: ${formattedAttackPower}`;
+
+}
+
+function updateEnemyIndicatorToLimit(enemyIndicator, enemyOrangeBar, enemyattackText, enemyAttackLimit) {
+  const barHeight = enemyOrangeBar.offsetHeight;
+  const newTop = (enemyAttackLimit / 10) * barHeight;
+  const attackPower = enemyAttackLimit;
+
+  // Update the orange bar (enemyOrangeBar)
+  enemyOrangeBar.style.height = `${newTop}px`;
+}
+
+
+
+// Game logic functions
+function handleBarClick(event) {
+  const barHeight = bar.offsetHeight;
+  const clickPosition = event.clientY - bar.getBoundingClientRect().top;
+  const newTop = Math.max(0, Math.min(barHeight - clickPosition , barHeight));
+
+  // Calculate the attack power based on the new top position
+  const attackPower = (newTop / (barHeight )) * 10;
+
+  // Check if the attack power is less than or equal to the new attack limit
+  if (attackPower <= playerAttackLimit) {
+    return; // Do not update the indicator and attack action
+  }
+
+  // Update the indicator and perform the attack action
+  updateIndicator(indicator, attackLimitBar, attackText, newTop, attackPower);
+  updateActionButton(actionButton, attackPower);
+}
+
+function performPlayerTurn() {
+  if (isPlayerTurn) return;
+  isPlayerTurn = true;
+  let playerDefends = false;
+  playerAttackPower = parseFloat(indicator.style.bottom) / (bar.offsetHeight) * 10 || 0;
+  let enemyDefends = false;
+  playerAttackLimit += attackLimitRecoveryRate;
+  enemyAttackLimit += attackLimitRecoveryRate;
+  // Randomly decide whether the enemy will defend
+  const defendChance = Math.random();
+  if (defendChance <= 0.25) {
+    enemyDefends = true;
+    enemyAttackPower = 0.0; // Set enemy attack power to 0.0 if enemy defends
+    updateEnemyIndicator(enemyIndicator, enemyOrangeBar, enemyattackText, 0.0, 0.0); // Set enemy indicator to 0.0 if enemy defends
+  } else {
+    enemyAttackPower = Math.random() * (enemyAttackLimit - 0.1) + 0.1;
+    enemyAttackPower = Math.min(enemyAttackPower, 10); // Limit enemy attack power to a maximum of 10
+  const barHeight = enemyOrangeBar.offsetHeight - 8;
+  const newTop = (enemyAttackPower / 15) * barHeight;
+  updateEnemyIndicator(enemyIndicator, enemyOrangeBar, enemyattackText, newTop,enemyAttackPower);
+  }
+
+  // Update the enemy attack power after the enemy attacks
+  if (enemyAttackPower < enemyAttackLimit) {
+    updateEnemyAttackPower(enemyIndicator, enemyOrangeBar, enemyattackText, enemyAttackPower);
+  } else {
+    updateEnemyIndicatorToLimit(enemyIndicator, enemyOrangeBar, enemyattackText, enemyAttackLimit);
+  }
+
+  if (playerAttackPower < 0.1)
+  {
+  playerDefends = true;
+  }
+
+  logContainer.innerHTML += `<div class="log-entry">Turn ${attackCount++}</div>`;
+
+  if (playerDefends && enemyDefends) {
+    // Both defend
+    playerAttackLimit += 2;
+    enemyAttackLimit += 2;
+    logContainer.innerHTML += `<div class="log-entry">Player defends</div>`;
+    logContainer.innerHTML += `<div class="log-entry">Enemy defends</div>`;
+  } else if (playerDefends) {
+    // Player defends, enemy attacks
+    playerAttackLimit += 2;
+    playerStamina -= 1;
+    logContainer.innerHTML += `<div class="log-entry">Player defends</div>`;
+    logContainer.innerHTML += `<div class="log-entry">Enemy attacked with ${enemyAttackPower === 10 ? '10' : enemyAttackPower.toFixed(1).replace('.0', '')}</div>`;
+    showDamageNumber(1, true); 
+
+  } else if (enemyDefends) {
+    // Player attacks, enemy defends
+    enemyAttackLimit += 2;
+    enemyStamina -= 1;
+    logContainer.innerHTML += `<div class="log-entry">Player attacked with ${playerAttackPower === 10 ? '10' : playerAttackPower.toFixed(1).replace('.0', '')}</div>`;
+    logContainer.innerHTML += `<div class="log-entry">Enemy defends</div>`;
+    showDamageNumber(1, false); 
+  } else {
+    // Neither defends
+    logContainer.innerHTML += `<div class="log-entry">Player attacked with ${playerAttackPower === 10 ? '10' : playerAttackPower.toFixed(1).replace('.0', '')}</div>`;
+    logContainer.innerHTML += `<div class="log-entry">Enemy attacked with ${enemyAttackPower === 10 ? '10' : enemyAttackPower.toFixed(1).replace('.0', '')}</div>`;
+    determineRoundWinner(playerAttackPower, enemyAttackPower);
+  }
+
+  
+  updateStamina(staminaText, enemyStaminaText, playerStamina, enemyStamina);
+
+  if (playerStamina <= 0 || enemyStamina <= 0) {
+    endGame(actionButton, logContainer, playerStamina, enemyStamina);
+    return;
+  }
+
+  if (actionButton.textContent !== 'WAIT') {
+    actionButton.disabled = true;
+    actionButton.textContent = 'WAIT';
+
+    setTimeout(() => {
+      isPlayerTurn = false;
+      actionButton.disabled = false;
+      updateActionButton(actionButton, playerAttackPower);
+
+      // Recover attack limits
+      const playerReductionPercentage = (playerAttackPower * 10) / 100;
+      const enemyReductionPercentage = (enemyAttackPower * 10) / 100;
+
+      playerAttackLimit -= playerAttackLimit * playerReductionPercentage;
+      enemyAttackLimit -= enemyAttackLimit * enemyReductionPercentage;
+
+      // Make sure the attack limits don't exceed their maximum values
+      playerAttackLimit = Math.min(playerAttackLimit, playerMaxAttackLimit);
+      enemyAttackLimit = Math.min(enemyAttackLimit, enemyMaxAttackLimit);
+
+      // Update the attack limit text on the UI
+      attacklimitText.textContent = `Attack Limit: ${playerAttackLimit === 10 ? '10' : playerAttackLimit.toFixed(1).replace('.0', '')}`;
+      enemylimitattackText.textContent = `Attack Limit: ${enemyAttackLimit === 10 ? '10' : enemyAttackLimit.toFixed(1).replace('.0', '')}`;
+
+      // Check if the player attack power is less than the new attack limit
+      if (playerAttackPower < playerAttackLimit) {
+        updateIndicatorToLimit(indicator, attackLimitBar, attackText);
+      } else {
+        updateAttackPower(indicator, attackLimitBar, attackText);
+        updateIndicator(indicator, attackLimitBar, attackText, newTop, playerAttackPower);
+        updateIndicatorToLimit(indicator, attackLimitBar, attackText);
+      }
+    }, 1000);
+  }
+
+  updateLogScroll(logContainer);
+}
+
+function determineRoundWinner(playerAttackPower, enemyAttackPower) {
+  playerAttackPower = playerAttackPower.toFixed(1);
+  enemyAttackPower = enemyAttackPower.toFixed(1);
+  var damage = calculateDamage(playerAttackPower, enemyAttackPower);
+
+  if (playerAttackPower === enemyAttackPower) {
+    // Tie
+    logContainer.innerHTML += '<div class="log-entry">* It\'s a tie! *</div>';
+  } else if (playerAttackPower > enemyAttackPower) {
+    // Player wins
+    logContainer.innerHTML += '<div class="log-entry">* Player wins the round! *</div>';
+    enemyStamina -= damage;
+    showDamageNumber(damage, false); // Show player's damage number
+  } else {
+    // Enemy wins
+    logContainer.innerHTML += '<div class="log-entry">* Enemy wins the round! *</div>';
+    playerStamina -= damage;
+    showDamageNumber(damage, true); // Show enemy's damage number
+  }
+}
+
+  function calculateDamage(playerAttackPower, enemyAttackPower) {
+    if (playerAttackPower >= 7 && enemyAttackPower >= 5) {
+      return 4;
+  } else if (playerAttackPower <= 6 && enemyAttackPower <= 4) {
+      return 3;
+  } else {
+      return 2;
+    }
+  }
+
+function showDamageNumber(damage, isPlayer) {
+  const damageNumber = document.createElement('div');
+  damageNumber.classList.add('damage-number');
+  damageNumber.textContent = -damage;
+
+  document.body.appendChild(damageNumber);
+
+  // Position the damage number based on the source of the damage
+  if (isPlayer) {
+    damageNumber.classList.add('player-damage');
+  } else {
+    damageNumber.classList.add('enemy-damage');
+  }
+
+  // Animate the damage number
+  setTimeout(() => {
+    damageNumber.style.opacity = 0;
+    damageNumber.style.transform = 'translateY(-100px)';
+    damageNumber.addEventListener('transitionend', () => {
+      document.body.removeChild(damageNumber);
+    });
+  }, 1700);
+}
+
+
+function endGame(actionButton, logContainer, playerStamina, enemyStamina) {
+  actionButton.disabled = true;
+  actionButton.style.display = 'none';
+
+  if (playerStamina > enemyStamina) {
+    playerWins = true;
+    logContainer.innerHTML += '<div class="log-entry">---Player Wins!---</div>';
+  } else if (playerStamina < enemyStamina) {
+    logContainer.innerHTML += '<div class="log-entry">---Enemy Wins!---</div>';
+  } else {
+    logContainer.innerHTML += '<div class="log-entry">---It\'s a tie!---</div>';
+  }
+
+  updateLogScroll(logContainer);
+}
+
+
+ // Initial setup
+ playerAttackLimit = playerMaxAttackLimit;
+enemyAttackLimit = enemyMaxAttackLimit;
+updateStamina(staminaText, enemyStaminaText, playerStamina, enemyStamina);
+updateActionButton(actionButton, playerAttackPower);
+updateIndicatorToLimit(indicator, attackLimitBar, attackText);
+updateEnemyIndicatorToLimit(enemyIndicator, enemyOrangeBar, enemyattackText, enemyAttackLimit);
+
+
+</script>
+</body>
+</html>
